@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ucarinc.umeng.dao.EventInfoMapper">
+
+    <!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="com.ucarinc.umeng.entity.EventInfo" id="BaseResultMap">
+
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="count" property="count" jdbcType="INTEGER"/>
+        <result column="displayName" property="displayName" jdbcType="VARCHAR"/>
+
+
+    </resultMap>
+
+
+    <!-- resultMap都是查询结果使用 -->
+    <select id="selectAllEventInfo" resultMap="BaseResultMap">
+        select *
+        from EventInfo
+
+    </select>
+
+    <!-- 由外边进来的参数，只能自定义类型 -->
+    <insert id="insertEventInfo" parameterType="java.util.List">
+        insert into EventInfo (name, count , id,
+        displayName)
+        values
+        <foreach collection="eventInfos" item="event" separator=",">
+            (#{event.name,jdbcType=VARCHAR}, #{event.count,jdbcType=INTEGER}, #{event.id,jdbcType=VARCHAR},
+            #{event.displayName,jdbcType=VARCHAR}
+            )
+        </foreach>
+
+
+    </insert>
+
+
+</mapper>
