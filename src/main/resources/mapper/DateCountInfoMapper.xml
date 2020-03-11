@@ -14,12 +14,14 @@
     </resultMap>
 
 
-    <!-- resultMap都是查询结果使用 -->
-<!--    <select id="selectAllEventInfo" resultMap="BaseResultMap">-->
-<!--        select *-->
-<!--        from EventInfo-->
 
-<!--    </select>-->
+    <!-- resultMap都是查询结果使用 -->
+    <select id="selectDateCountInfo" resultMap="BaseResultMap">
+        select *
+        from EventInfo
+        where date is #{date}
+
+    </select>
 
     <!-- 由外边进来的参数，只能自定义类型 -->
     <insert id="insertDateCountInfo" parameterType="java.util.List">

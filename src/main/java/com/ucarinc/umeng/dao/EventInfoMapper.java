@@ -12,5 +12,5 @@ import java.util.List;
 public interface EventInfoMapper {
     int insertEventInfo(@Param("eventInfos") List<EventInfo> eventInfos);
 
-    List<EventInfo> selectAllEventInfo();
+    Boolean deleteAll();
 }

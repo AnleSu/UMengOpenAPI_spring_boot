@@ -1,22 +1,23 @@
 package com.ucarinc.umeng.service;
 
 import com.ucarinc.umeng.dao.EventInfoMapper;
+import com.ucarinc.umeng.dao.EventProbabilityInfoMapper;
 import com.ucarinc.umeng.entity.EventInfo;
+import com.ucarinc.umeng.entity.EventProbabilityInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class EventInfoServiceImpl  implements EventInfoService{
+public class EventProbilityInfoServiceImpl implements EventProbabilityInfoService {
 
     @Autowired
-    EventInfoMapper eventInfoMapper;
+    EventProbabilityInfoMapper eventProbabilityInfoMapper ;
     @Override
-    public Boolean insertEventInfo(List<EventInfo> eventInfos) {
-
+    public Boolean insertProbabilityInfo(List<EventProbabilityInfo> probabilityInfos) {
         try{
-            if(eventInfoMapper.insertEventInfo(eventInfos)>0){
+            if(eventProbabilityInfoMapper.insertProbabilityInfo(probabilityInfos)){
                 return true;
             }else{
                 return false;
@@ -29,15 +30,4 @@ public class EventInfoServiceImpl  implements EventInfoService{
     }
 
 
-    @Override
-    public Boolean deleteAll(){
-        try{
-
-            return eventInfoMapper.deleteAll();
-        }catch (Exception e){
-            e.printStackTrace();
-            System.out.println("数据库删除异常");
-            return false;
-        }
-    }
 }

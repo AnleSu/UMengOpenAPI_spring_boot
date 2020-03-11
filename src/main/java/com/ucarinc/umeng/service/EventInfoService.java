@@ -9,5 +9,5 @@ public interface EventInfoService {
 
     Boolean insertEventInfo(@Param("eventInfos") List<EventInfo> eventInfos);
 
-    List<EventInfo> selectAllEventInfo();
+    Boolean deleteAll();
 }

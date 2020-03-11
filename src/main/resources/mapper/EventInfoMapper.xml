@@ -15,11 +15,11 @@
 
 
     <!-- resultMap都是查询结果使用 -->
-    <select id="selectAllEventInfo" resultMap="BaseResultMap">
-        select *
-        from EventInfo
+<!--    <select id="selectAllEventInfo" resultMap="BaseResultMap">-->
+<!--        select *-->
+<!--        from EventInfo-->
 
-    </select>
+<!--    </select>-->
 
     <!-- 由外边进来的参数，只能自定义类型 -->
     <insert id="insertEventInfo" parameterType="java.util.List">
@@ -34,6 +34,11 @@
 
 
     </insert>
+
+    <delete id="deleteAll">
+        delete from EventInfo
+        where 1=1
+    </delete>
 
 
 </mapper>
