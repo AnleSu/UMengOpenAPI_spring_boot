@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,14 +56,15 @@ public class HelloController {
 
 
     @ResponseBody
-    @RequestMapping("/eventList/{startDate}/{endDate}")
+    @RequestMapping("/eventList")
     //根据版本号 时间段获取所有事件列表
-    public String eventList(@PathVariable String startDate, @PathVariable String endDate,@RequestParam(defaultValue = "7.0.0") String version){
+    public String eventList(String startDate, String endDate,@RequestParam(defaultValue = "7.0.0") String version){
         configApiExecutor();
         String resultStr = UMengRequestCommon.umengUappEventList(apiExecutor,startDate,endDate,version);
         JSONObject jsonObject = JSONObject.parseObject(resultStr);//字符串转json对象
         String data = jsonObject.getString("eventInfo");
         List<EventInfo> list=JSONObject.parseArray(data, EventInfo.class);
+
         Boolean deleteResult = eventInfoService.deleteAll();
         logger.info("删除事件表" + deleteResult);
 
@@ -72,103 +74,40 @@ public class HelloController {
             logger.info("数据入库失败");
         }
 
+        List<EventProbabilityInfo> probabilityInfos = new ArrayList<>();
+        List<DateCountInfo> startUpInfos = new ArrayList<>();
+
+        //遍历事件列表 请求一个时间段内该事件的统计数据
         for(int i = 0; i < list.size(); i++) {
             EventInfo eventInfo = list.get(i);
-            eventDataFun(eventInfo.getName(), startDate, endDate);
-        }
-        return resultStr;
-
-    }
-
-    @ResponseBody
-    @RequestMapping("/eventData")
-    public String eventData(String eventName, String startDate, String endDate){
-        String resultStr = UMengRequestCommon.umengUappEventGetData(apiExecutor,eventName, startDate, endDate);
-
-        EventData jsonObject = JSON.parseObject(resultStr, EventData.class);//字符串转json对象
-        EventData.EventDataItem item = jsonObject.eventData.get(0);
-        if (item == null)
-            return null;
-        int count = item.data.size();
-        List<DateCountInfo> list = new ArrayList<>();
-        for (int i =0 ; i<count;i++){
-            DateCountInfo info = new DateCountInfo();
-            info.setCount(item.data.get(i));
-            info.setDate(item.dates.get(i));
-            info.setName(eventName);
-            list.add(info);
-        }
-
-        if(dateCountInfoService.insertDateCountInfo(list)){
-            logger.info("数据入库成功");
-        }else{
-            logger.info("数据入库失败");
-        }
-        return resultStr;
-    }
-
-    @ResponseBody
-    @RequestMapping("/getLaunches")
-    //查询类型（按日daily,按周weekly,按月monthly 查询）
-    public String  getLaunches(String startDate, String endDate, @RequestParam(defaultValue = "daily") String periodType) {
-        return UMengRequestCommon.umengUappGetLaunches(apiExecutor, startDate, endDate, periodType);
-    }
 
 
-    public void eventDataFun(String eventName, String startDate, String endDate){
-        String resultStr = UMengRequestCommon.umengUappEventGetData(apiExecutor,eventName, startDate, endDate);
-        EventData jsonObject = JSON.parseObject(resultStr, EventData.class);//字符串转json对象
-        EventData.EventDataItem item = jsonObject.eventData.get(0);
-        if (item == null)
-            return;
-        List<DateCountInfo> list = new ArrayList<>();
-
-        List<EventProbabilityInfo> probabilityInfos = new ArrayList<>();
-        List<EventProbabilityInfo> startUpInfos = new ArrayList<>();
-        for (int i =0 ; i<item.data.size();i++){
-            DateCountInfo info = new DateCountInfo();
-            info.setCount(item.data.get(i));
-            info.setDate(item.dates.get(i));
-            info.setName(eventName);
-            list.add(info);
-
-//            EventProbabilityInfo eventProbabilityInfo = new EventProbabilityInfo();
-//            eventProbabilityInfo.setCount(item.data.get(i));
-//            eventProbabilityInfo.setDate(item.dates.get(i));
-//            eventProbabilityInfo.setName(eventName);
-//            eventProbabilityInfo.setProbability(1.0);
-//            probabilityInfos.add(eventProbabilityInfo);
             //筛选出APP启动次数的数据
-            if (eventName == "XQ_App_StartUp") {
-                EventProbabilityInfo probabilityInfo = new EventProbabilityInfo();
-                probabilityInfo.setCount(item.data.get(i));
-                probabilityInfo.setDate(item.dates.get(i));
-                probabilityInfo.setName(eventName);
-                probabilityInfo.setProbabilit(1.0);
-                startUpInfos.add(probabilityInfo);
+            if (eventInfo.getName().equals("XQ_App_StartUp")) {
+                startUpInfos = eventDataFun(eventInfo.getName(), startDate, endDate);
+
+            } else {
+                eventDataFun(eventInfo.getName(), startDate, endDate);
             }
         }
 
 
-        //原始数据入库
-        if(dateCountInfoService.insertDateCountInfo(list)){
-            logger.info("数据入库成功");
-        }else{
-            logger.info("数据入库失败");
-        }
+        List<DateCountInfo> currentDateInfos = new ArrayList<>();
+        DecimalFormat df = new DecimalFormat("0.00");
 
-        for (int i =0 ; i<startUpInfos.size();i++) {
-            EventProbabilityInfo startUpInfo = startUpInfos.get(i);
+        for (int i = 0; i < startUpInfos.size(); i++) {
+            DateCountInfo startUpInfo = startUpInfos.get(i);
             //根据日期 取到该日期下的所有统计数据
-            List<DateCountInfo> currentDateInfos = dateCountInfoService.selectDateCountInfo(startUpInfo.getDate());
+            currentDateInfos = dateCountInfoService.selectDateCountInfo(startUpInfo.getDate());
             for (int j = 0;j < currentDateInfos.size();j++) {
+
                 //遍历每一条数据 计算概率
-                DateCountInfo dateCountInfo = currentDateInfos.get(i);
+                DateCountInfo dateCountInfo = currentDateInfos.get(j);
                 EventProbabilityInfo eventProbabilityInfo = new EventProbabilityInfo();
                 eventProbabilityInfo.setCount(dateCountInfo.getCount());
                 eventProbabilityInfo.setDate(dateCountInfo.getDate());
                 eventProbabilityInfo.setName(dateCountInfo.getName());
-                eventProbabilityInfo.setProbabilit((double) (dateCountInfo.getCount() / startUpInfo.getCount()));
+                eventProbabilityInfo.setProbabilit(df.format( (double)dateCountInfo.getCount() / startUpInfo.getCount()));
                 probabilityInfos.add(eventProbabilityInfo);
             }
         }
@@ -180,7 +119,65 @@ public class HelloController {
             logger.info("概率数据入库失败");
         }
 
+        return resultStr;
     }
+
+    @ResponseBody
+    @RequestMapping("/getEventList")
+    //根据版本号 时间段获取所有事件列表   http://localhost:8080/api/getEventList?startDate=2020-03-10&endDate=2020-03-11
+    public String getEventList(String startDate, String endDate ,@RequestParam(defaultValue = "7.0.0") String version) {
+        configApiExecutor();
+        String resultStr = UMengRequestCommon.umengUappEventList(apiExecutor, startDate, endDate, version);
+        return resultStr;
+    }
+
+    public List<DateCountInfo> eventDataFun(String eventName, String startDate, String endDate){
+        String resultStr = UMengRequestCommon.umengUappEventGetData(apiExecutor,eventName, startDate, endDate);
+        EventData jsonObject = JSON.parseObject(resultStr, EventData.class);//字符串转json对象
+        EventData.EventDataItem item = jsonObject.eventData.get(0);
+        if (item == null)
+            return null;
+        List<DateCountInfo> list = new ArrayList<>();
+
+
+        for (int i = 0; i < item.data.size(); i++){
+            DateCountInfo info = new DateCountInfo();
+            info.setCount(item.data.get(i));
+            info.setDate(item.dates.get(i));
+            info.setName(eventName);
+            list.add(info);
+
+        }
+
+
+        //原始数据入库
+        if(dateCountInfoService.insertDateCountInfo(list)){
+            logger.info("数据入库成功");
+        }else{
+            logger.info("数据入库失败");
+        }
+
+        return list;
+
+    }
+
+
+    @ResponseBody
+    @RequestMapping("/eventData")
+    public String eventData(String eventName, String startDate, String endDate){
+        String resultStr = UMengRequestCommon.umengUappEventGetData(apiExecutor,eventName, startDate, endDate);
+        return resultStr;
+    }
+
+    @ResponseBody
+    @RequestMapping("/getLaunches")
+    //查询类型（按日daily,按周weekly,按月monthly 查询）
+    public String  getLaunches(String startDate, String endDate, @RequestParam(defaultValue = "daily") String periodType) {
+        return UMengRequestCommon.umengUappGetLaunches(apiExecutor, startDate, endDate, periodType);
+    }
+
+
+
 
 
 }

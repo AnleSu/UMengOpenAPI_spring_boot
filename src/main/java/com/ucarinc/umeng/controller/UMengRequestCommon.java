@@ -19,8 +19,8 @@ public class UMengRequestCommon {
         // 测试环境只支持http
         // param.getOceanRequestPolicy().setUseHttps(false);
         param.setAppkey(ZC_APP_KEY);
-        param.setStartDate(startDate);
-        param.setEndDate(endDate);
+        param.setStartDate(startDate == null || startDate.isEmpty() ? getYesterday() : startDate);
+        param.setEndDate(endDate == null || endDate.isEmpty() ? getYesterday() : endDate);
         param.setEventName(eventName);
 
         try {
@@ -108,9 +108,9 @@ public class UMengRequestCommon {
         // 测试环境只支持http
         // param.getOceanRequestPolicy().setUseHttps(false);
         param.setAppkey(ZC_APP_KEY);
-        param.setStartDate(startDate);
-        param.setEndDate(endDate);
-        param.setPerPage(10);//暂时设置为最大一百 一页
+        param.setStartDate(startDate == null || startDate.isEmpty() ? getYesterday() : startDate);
+        param.setEndDate(endDate == null || endDate.isEmpty() ? getYesterday() : endDate);
+        param.setPerPage(100);//暂时设置为最大一百 一页
         param.setPage(1);
         param.setVersion(version);
 
@@ -131,8 +131,8 @@ public class UMengRequestCommon {
         // 测试环境只支持http
         // param.getOceanRequestPolicy().setUseHttps(false);
         param.setAppkey(ZC_APP_KEY);
-        param.setStartDate(startDate == null ? getYesterday() : startDate);
-        param.setEndDate(endDate == null ? getYesterday() : endDate);
+        param.setStartDate(startDate == null || startDate.isEmpty() ? getYesterday() : startDate);
+        param.setEndDate(endDate == null || endDate.isEmpty() ? getYesterday() : endDate);
         param.setPeriodType(periodType);
 
         try {

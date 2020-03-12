@@ -10,6 +10,6 @@ import java.util.List;
 public interface DateCountInfoService {
     Boolean insertDateCountInfo(@Param("dateCountInfos") List<DateCountInfo> dateCountInfos);
 
-    List<DateCountInfo> selectDateCountInfo(String date);
+    List<DateCountInfo> selectDateCountInfo(@Param("date") String date);
 
 }

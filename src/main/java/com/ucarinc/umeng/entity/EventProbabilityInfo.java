@@ -4,7 +4,7 @@ public class EventProbabilityInfo {
     private String date;
     private Integer count;
     private String name;
-    private Double probabilit;
+    private String probabilit;
 
     public String getName() {
         return name;
@@ -30,11 +30,11 @@ public class EventProbabilityInfo {
         this.date = date;
     }
 
-    public Double getProbabilit() {
+    public String getProbabilit() {
         return probabilit;
     }
 
-    public void setProbabilit(Double probabilit) {
+    public void setProbabilit(String probabilit) {
         this.probabilit = probabilit;
     }
 }

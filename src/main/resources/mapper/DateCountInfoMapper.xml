@@ -16,10 +16,11 @@
 
 
     <!-- resultMap都是查询结果使用 -->
-    <select id="selectDateCountInfo" resultMap="BaseResultMap">
+    <!-- 判断日期不用 is 用 = -->
+    <select id="selectDateCountInfo" resultMap="BaseResultMap" parameterType="java.lang.String">
         select *
-        from EventInfo
-        where date is #{date}
+        from DateCountInfo
+        where date = #{date}
 
     </select>
 

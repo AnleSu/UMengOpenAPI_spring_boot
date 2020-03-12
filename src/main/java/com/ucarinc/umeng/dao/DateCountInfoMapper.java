@@ -10,6 +10,6 @@ import java.util.List;
 public interface DateCountInfoMapper {
     int insertDateCountInfo(@Param("dateCountInfo") List<DateCountInfo> dateCountInfo);
 
-    List<DateCountInfo> selectDateCountInfo(String date);
+    List<DateCountInfo> selectDateCountInfo(@Param("date") String date);
 
 }
