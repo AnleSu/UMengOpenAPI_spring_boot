@@ -65,8 +65,8 @@ public class HelloController {
         String data = jsonObject.getString("eventInfo");
         List<EventInfo> list=JSONObject.parseArray(data, EventInfo.class);
 
-        Boolean deleteResult = eventInfoService.deleteAll();
-        logger.info("删除事件表" + deleteResult);
+//        Boolean deleteResult = eventInfoService.deleteAll();
+//        logger.info("删除事件表" + deleteResult);
 
         if(eventInfoService.insertEventInfo(list)){
             logger.info("数据入库成功");
@@ -131,9 +131,20 @@ public class HelloController {
         return resultStr;
     }
 
+    @ResponseBody
+    @RequestMapping("/getEventParamList")
+    public String getEventParamList(String startDate, String endDate ,String eventId) {
+        configApiExecutor();
+        String resultStr = UMengRequestCommon.umengUappEventParamList(apiExecutor,eventId, startDate, endDate);
+        return resultStr;
+    }
+
     public List<DateCountInfo> eventDataFun(String eventName, String startDate, String endDate){
         String resultStr = UMengRequestCommon.umengUappEventGetData(apiExecutor,eventName, startDate, endDate);
+        logger.info("请求结果是 " + resultStr);
         EventData jsonObject = JSON.parseObject(resultStr, EventData.class);//字符串转json对象
+
+
         EventData.EventDataItem item = jsonObject.eventData.get(0);
         if (item == null)
             return null;

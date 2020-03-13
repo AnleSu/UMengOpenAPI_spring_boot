@@ -33,6 +33,26 @@ public class UMengRequestCommon {
         }
     }
 
+   //获取事件参数列表
+    public static String umengUappEventParamList(ApiExecutor apiExecutor,String eventId, String startDate, String endDate) {
+        UmengUappEventParamListParam param = new UmengUappEventParamListParam();
+        // 测试环境只支持http
+        // param.getOceanRequestPolicy().setUseHttps(false);
+        param.setStartDate(startDate == null || startDate.isEmpty() ? getYesterday() : startDate);
+        param.setEndDate(endDate == null || endDate.isEmpty() ? getYesterday() : endDate);
+        param.setEventId(eventId);
+        param.setAppkey(ZC_APP_KEY);
+
+        try {
+            UmengUappEventParamListResult result = apiExecutor.execute(param);
+            System.out.println(JSONObject.toJSONString(result));
+            return JSONObject.toJSONString(result);
+        } catch (OceanException e) {
+            System.out.println("errorCode=" + e.getErrorCode() + ", errorMessage=" + e.getErrorMessage());
+            return e.getErrorMessage();
+        }
+    }
+
     //获取所有App统计数据
     public String umengUappGetAllAppData(ApiExecutor apiExecutor) {
         UmengUappGetAllAppDataParam param = new UmengUappGetAllAppDataParam();
@@ -110,7 +130,7 @@ public class UMengRequestCommon {
         param.setAppkey(ZC_APP_KEY);
         param.setStartDate(startDate == null || startDate.isEmpty() ? getYesterday() : startDate);
         param.setEndDate(endDate == null || endDate.isEmpty() ? getYesterday() : endDate);
-        param.setPerPage(100);//暂时设置为最大一百 一页
+        param.setPerPage(50);//暂时设置为最大一百 一页
         param.setPage(page);
         param.setVersion(version);
 
