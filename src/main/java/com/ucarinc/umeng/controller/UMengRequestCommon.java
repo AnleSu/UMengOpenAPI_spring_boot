@@ -103,7 +103,7 @@ public class UMengRequestCommon {
     }
 
     //获取事件列表
-    public static String umengUappEventList(ApiExecutor apiExecutor, String startDate, String endDate, String version) {
+    public static String umengUappEventList(ApiExecutor apiExecutor, String startDate, String endDate, String version, Integer page) {
         UmengUappEventListParam param = new UmengUappEventListParam();
         // 测试环境只支持http
         // param.getOceanRequestPolicy().setUseHttps(false);
@@ -111,7 +111,7 @@ public class UMengRequestCommon {
         param.setStartDate(startDate == null || startDate.isEmpty() ? getYesterday() : startDate);
         param.setEndDate(endDate == null || endDate.isEmpty() ? getYesterday() : endDate);
         param.setPerPage(100);//暂时设置为最大一百 一页
-        param.setPage(1);
+        param.setPage(page);
         param.setVersion(version);
 
         try {

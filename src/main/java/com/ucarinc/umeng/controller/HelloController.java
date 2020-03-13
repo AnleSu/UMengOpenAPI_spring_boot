@@ -58,9 +58,9 @@ public class HelloController {
     @ResponseBody
     @RequestMapping("/eventList")
     //根据版本号 时间段获取所有事件列表
-    public String eventList(String startDate, String endDate,@RequestParam(defaultValue = "7.0.0") String version){
+    public String eventList(String startDate, String endDate,@RequestParam(defaultValue = "7.0.0") String version, Integer page){
         configApiExecutor();
-        String resultStr = UMengRequestCommon.umengUappEventList(apiExecutor,startDate,endDate,version);
+        String resultStr = UMengRequestCommon.umengUappEventList(apiExecutor,startDate,endDate,version,page);
         JSONObject jsonObject = JSONObject.parseObject(resultStr);//字符串转json对象
         String data = jsonObject.getString("eventInfo");
         List<EventInfo> list=JSONObject.parseArray(data, EventInfo.class);
@@ -125,9 +125,9 @@ public class HelloController {
     @ResponseBody
     @RequestMapping("/getEventList")
     //根据版本号 时间段获取所有事件列表   http://localhost:8080/api/getEventList?startDate=2020-03-10&endDate=2020-03-11
-    public String getEventList(String startDate, String endDate ,@RequestParam(defaultValue = "7.0.0") String version) {
+    public String getEventList(String startDate, String endDate ,@RequestParam(defaultValue = "7.0.0") String version,Integer page) {
         configApiExecutor();
-        String resultStr = UMengRequestCommon.umengUappEventList(apiExecutor, startDate, endDate, version);
+        String resultStr = UMengRequestCommon.umengUappEventList(apiExecutor, startDate, endDate, version,page);
         return resultStr;
     }
 
