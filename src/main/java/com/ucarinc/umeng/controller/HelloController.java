@@ -27,9 +27,9 @@ public class HelloController {
 
     public static final Logger logger = LoggerFactory.getLogger(HelloController.class);
 
-    public static final String APP_KEY = "4009351";
+    public static final String APP_KEY = "";
 
-    public static final String SEC_KEY = "ATZNZYZ6fT";
+    public static final String SEC_KEY = "";
 
     public static final String SERVER_HOST = "gateway.open.umeng.com";
 

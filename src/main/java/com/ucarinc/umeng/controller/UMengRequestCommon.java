@@ -10,7 +10,7 @@ import java.util.Date;
 
 public class UMengRequestCommon {
     //    租车iOS app_key
-    public static final String ZC_APP_KEY = "519b040156240b7b3300d8b4";
+    public static final String ZC_APP_KEY = "";
 
 
     //获取事件统计数据
