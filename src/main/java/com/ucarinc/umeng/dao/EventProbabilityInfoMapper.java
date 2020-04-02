@@ -11,4 +11,6 @@ import java.util.List;
 public interface EventProbabilityInfoMapper {
 
     Boolean insertProbabilityInfo(@Param("probabilityInfos") List<EventProbabilityInfo> probabilityInfos);
+
+    List<EventProbabilityInfo> selectByNameAndDate(String name, String startDate, String endDate);
 }

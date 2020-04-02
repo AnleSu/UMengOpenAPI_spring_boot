@@ -29,5 +29,10 @@ public class EventProbilityInfoServiceImpl implements EventProbabilityInfoServic
         }
     }
 
+    @Override
+    public List<EventProbabilityInfo> selectByNameAndDate(String name, String startDate, String endDate) {
+        return eventProbabilityInfoMapper.selectByNameAndDate(name, startDate, endDate);
+    }
+
 
 }

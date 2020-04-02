@@ -1,9 +1,11 @@
 package com.ucarinc.umeng.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.ocean.rawsdk.ApiExecutor;
 
+import com.mysql.cj.xdevapi.JsonArray;
 import com.ucarinc.umeng.entity.DateCountInfo;
 import com.ucarinc.umeng.entity.EventData;
 import com.ucarinc.umeng.entity.EventInfo;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -27,9 +30,9 @@ public class HelloController {
 
     public static final Logger logger = LoggerFactory.getLogger(HelloController.class);
 
-    public static final String APP_KEY = "";
+    public static final String APP_KEY = "4009351";
 
-    public static final String SEC_KEY = "";
+    public static final String SEC_KEY = "ATZNZYZ6fT";
 
     public static final String SERVER_HOST = "gateway.open.umeng.com";
 
@@ -54,6 +57,27 @@ public class HelloController {
     @Autowired
     EventProbabilityInfoService eventProbabilityInfoService;
 
+    @ResponseBody
+    @RequestMapping("/getHomePageEventProbabilit")
+    //http://localhost:8080/api/getHomePageEventProbabilit?events=%20XQ_ZCN_Home_BannerClick,%20XQ_App_UserCenter&startDate=2020-04-01&endDate=2020-04-01
+    public String getHomePageEventProbabilit(@RequestParam(value = "events") List<String> events,String startDate, String endDate,@RequestParam(defaultValue = "7.0.0") String version) {
+        if (events.isEmpty()) return "事件名称参数错误，必须是字符串数组";
+        if (startDate.isEmpty() || endDate.isEmpty()) return "开始，截止时间参数错误，必须是（yyyy-MM-dd）格式";
+
+        List<EventProbabilityInfo> resultArr = new ArrayList<>();
+
+        for (int i = 0; i < events.size(); i++) {
+            String eventName = events.get(i);
+            List<EventProbabilityInfo> tempArr = eventProbabilityInfoService.selectByNameAndDate(eventName, startDate, endDate);
+            if (!tempArr.isEmpty()) {
+                resultArr.addAll(tempArr);
+            }
+        }
+
+
+        JSONArray jsonArray = new JSONArray(Collections.singletonList(resultArr));
+        return jsonArray.toJSONString();
+    }
 
     @ResponseBody
     @RequestMapping("/eventList")
@@ -186,10 +210,6 @@ public class HelloController {
     public String  getLaunches(String startDate, String endDate, @RequestParam(defaultValue = "daily") String periodType) {
         return UMengRequestCommon.umengUappGetLaunches(apiExecutor, startDate, endDate, periodType);
     }
-
-
-
-
 
 }
 

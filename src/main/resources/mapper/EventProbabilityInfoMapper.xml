@@ -27,5 +27,11 @@
 
     </insert>
 
+    <select id="selectByNameAndDate" resultMap="EventProbabilityInfo" parameterType="java.lang.String">
+        select *
+        from event_probability_info
+        where name = #{name} and date &gt;= #{startDate} and date &lt;= #{endDate}
+
+    </select>
 
 </mapper>

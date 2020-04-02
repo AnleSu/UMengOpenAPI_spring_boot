@@ -9,4 +9,6 @@ import java.util.List;
 public interface EventProbabilityInfoService {
 
     Boolean insertProbabilityInfo(List<EventProbabilityInfo> probabilityInfos);
+
+    List<EventProbabilityInfo> selectByNameAndDate(String name, String startDate, String endDate);
 }
