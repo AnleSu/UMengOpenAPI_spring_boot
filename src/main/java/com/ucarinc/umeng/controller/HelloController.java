@@ -20,6 +20,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -132,17 +133,22 @@ public class HelloController {
                 //分母一般不为零的，如果为零看需要抛出什么一样
             }
 
-            DecimalFormat df = new DecimalFormat("0.00");
-            Integer sum = appstartInfos.stream().mapToInt(EventProbabilityInfo::getCount).sum();
+            double sum = appstartInfos.stream().mapToDouble(EventProbabilityInfo::getCount).sum();
             for (int i = 0; i < events.length; i++) {
                 String eventName = events[i];
                 List<EventProbabilityInfo> tempArr = eventProbabilityInfoService.selectByNameAndDate(eventName, startDate, endDate);
                 if (!tempArr.isEmpty()) {
-                    Integer sum1 = tempArr.stream().mapToInt(EventProbabilityInfo::getCount).sum();
+                    double sum1 = tempArr.stream().mapToDouble(EventProbabilityInfo::getCount).sum();
                     EventProbabilityInfo resultInfo = new EventProbabilityInfo();
                     resultInfo.setName(eventName);
-                    resultInfo.setCount(sum1);
-                    resultInfo.setProbabilit(df.format(sum1 /sum));
+                    resultInfo.setCount((new Double(sum1)).intValue());
+
+                    BigDecimal sum1Dec = new BigDecimal(sum1);
+                    BigDecimal sumDec = new BigDecimal(sum);
+                    double c = sum1Dec.divide(sumDec,2,BigDecimal.ROUND_HALF_UP).doubleValue();
+
+                    resultInfo.setProbabilit(String.valueOf(c));
+//                    resultInfo.setProbabilit(df.format(sum1 /sum));
                     resultArr.add(resultInfo);
                 }
             }
@@ -152,6 +158,26 @@ public class HelloController {
 
         //对象数组转json
         return JSON.toJSONString(resultArr);
+    }
+
+    public static String numberBy2DecimalPlaces(String value) {
+        DecimalFormat df = new DecimalFormat("#.00");
+        return df.format(value);
+    }
+
+    public static String numberFormatByDecimalPlaces(String value) {
+        if (value == null || "".equals(value) || value.equalsIgnoreCase("null")) {
+            return value;
+        }
+        if (value.contains(".")) {
+            String[] strings = value.split(".");
+            if (strings.length > 1) {
+                if (strings[1].length() > 1) {
+                    return numberBy2DecimalPlaces(value);
+                }
+            }
+        }
+        return value;
     }
 
     @ResponseBody
@@ -212,7 +238,13 @@ public class HelloController {
                     eventProbabilityInfo.setCount(dateCountInfo.getCount());
                     eventProbabilityInfo.setDate(dateCountInfo.getDate());
                     eventProbabilityInfo.setName(dateCountInfo.getName());
-                    eventProbabilityInfo.setProbabilit(df.format( (double)dateCountInfo.getCount() / startUpInfo.getCount()));
+
+                    BigDecimal sum1Dec = new BigDecimal(dateCountInfo.getCount());
+                    BigDecimal sumDec = new BigDecimal(startUpInfo.getCount());
+                    double c = sum1Dec.divide(sumDec,2,BigDecimal.ROUND_HALF_UP).doubleValue();
+
+
+                    eventProbabilityInfo.setProbabilit(String.valueOf(c));
                     probabilityInfos.add(eventProbabilityInfo);
                 }
             }
